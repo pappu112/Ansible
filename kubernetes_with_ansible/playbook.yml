@@ -1,0 +1,6 @@
+---
+- name: Install Kubernets in ubuntu
+  hosts: ubuntu
+  become: true
+  tasks:
+    - include_tasks: tasks/install_docker.yml

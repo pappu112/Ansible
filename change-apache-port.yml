@@ -1,0 +1,33 @@
+---
+- name: change port for apache
+  hosts: web2
+  tasks:
+  - name: install https and firewalld
+    package:
+      name:
+        - httpd
+        - firewalld
+      state: latest
+  - name: start the services
+    service:
+       name: "{{ item }}"
+       state: started
+    with_items:
+        - httpd
+        - firewalld
+  - name: change apache port
+    replace:
+      path: /etc/httpd/conf/httpd.conf
+      regexp: "Listen 80"
+      replace: "Listen 8082"
+  - name: Restart apache service
+    service:
+       name: httpd
+       state: restarted
+  - name: enable 8082 port
+    firewalld:
+      port: 8082/tcp
+      zone: public
+      state: enabled
+      permanent: true
+      immediate: yes

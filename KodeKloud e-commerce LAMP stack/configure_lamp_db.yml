@@ -1,0 +1,28 @@
+---
+- name: configure lamp_db
+  hosts: db_servers
+  become: true
+  tasks:
+  - name: install packages
+    package:
+       name: mariadb-server,MySQL-python 
+       stae: installed
+  - name: copy files
+    copy:
+      src: files/my.cnf
+      dest: /etc/my.cnf
+  - name: start services
+    service:
+       name: mariadb,firewalld
+       state: stated
+       enabled: yes
+  - name: insert firewalld rulls
+    firewalld:
+       port: 3306/tcp
+       zone: public
+       permanent: yes
+       state: enabled
+       immediate: yes
+
+       
+    

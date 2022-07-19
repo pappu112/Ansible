@@ -1,0 +1,9 @@
+---
+- name: create a blank firewalld
+  hosts: web1
+  tasks:
+  - name: creare a text file
+    file: 
+      path: /opt/data/perm.txt
+      state: touch
+      mode: 0640

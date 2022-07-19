@@ -1,0 +1,10 @@
+---
+- name: install packages
+  hosts: all
+  become: true
+  tasks:
+  - name: install softwear
+    package:
+       name: libselinux-python,libsemanage-python,firewalld
+       state: latest
+  
