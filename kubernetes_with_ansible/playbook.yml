@@ -4,3 +4,4 @@
   become: true
   tasks:
     - include_tasks: tasks/install_docker.yml
+    - include_tasks: tasks/install_kubernetes.yml

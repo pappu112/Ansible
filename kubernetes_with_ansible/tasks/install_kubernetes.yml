@@ -1,0 +1,59 @@
+- name:  install softwaers 
+  apt:
+    name: apt-transport-https,curl
+    state: latest
+    update_cache: true
+- name: Add Apt-key
+  apt_key:
+      url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+      state: present
+- name: add Kubernetes' APT repository
+  apt_repository:
+    repo: deb http://apt.kubernetes.io/ kubernetes-xenial main
+    state: present
+    filename: 'kubernetes'
+- name: Update and upgrade apt packages
+  become: true
+  apt:
+    upgrade: yes
+    update_cache: yes
+    cache_valid_time: 86400 #One day
+- name: install kubectl,kubeadm,kubelet and kubernetes-cni
+  apt:
+    pkg:
+      - kubelet
+      - kubeadm
+      - kubectl
+      - kubernetes-cni
+    state: latest
+    update_cache: true
+- name: disable swap
+  command: sudo swapoff -a
+- name: set host name
+  command: sudo hostnamectl set-hostname kubernetes-master
+- name: configure br_netfilter
+  shell: |
+    sudo modprobe br_netfilter
+    sudo sysctl net.bridge.bridge-nf-call-iptables=1
+    rm /etc/containerd/config.toml
+    systemctl restart containerd
+- name: Initialize Kubernetes on Master Node
+  command: kubeadm init
+- name: make master node ready
+  shell: |
+    mkdir -p $HOME/.kube
+    sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+    sudo chown $(id -u):$(id -g) $HOME/.kube/config
+- name: apply funnal as kube network
+  command: sudo kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+- name: taint master node
+  command: kubectl taint nodes --all node-role.kubernetes.io/master-
+
+
+
+
+
+    
+
+
+      
